@@ -3,7 +3,7 @@ import PostItem from '../PostItem'
 import { useDispatch, useSelector } from 'react-redux'
 import { RootStore } from 'store'
 import { Post } from 'types/blog.type'
-import { deletePost, startEditingPost } from 'pages/blog/blog.reducer'
+import { deletePost, startEditingPost } from 'pages/blog/blog.slice'
 
 export default function PostList() {
   const postList = useSelector((state: RootStore) => state.blog.postList)

@@ -1,4 +1,4 @@
-import { createAction, createReducer, current, nanoid } from '@reduxjs/toolkit'
+import { createAction, createReducer, createSlice, current, nanoid } from '@reduxjs/toolkit'
 import { initPostList } from 'constants/blog'
 import { Post } from 'types/blog.type'
 
@@ -27,6 +27,21 @@ export const startEditingPost = createAction<string>('/blog/startEditingPost')
 export const cancelEditingPost = createAction('/blog/cancelEditingPost')
 
 export const finishEditingPost = createAction<Post>('/blog/finishEditingPost')
+
+const blogSlice = createSlice({
+  name: 'blog',
+  initialState: initState,
+  reducers: {
+    startEditingPost: (state, action) => {
+      const postId = action.payload
+      const post = state.postList.find((postItem) => postItem.id === postId) || null
+      state.postEditing = post
+    },
+    cancelEditingPost: (state, action) => {
+      state.postEditing = null
+    }
+  }
+})
 
 const blogReducer = createReducer(initState, (builder) => {
   builder
