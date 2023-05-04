@@ -1,7 +1,7 @@
-import { addPost, cancelEditingPost, finishEditingPost } from 'pages/blog/blog.slice'
+import { addPost, updatePost } from 'pages/blog/blog.slice'
 import React, { Fragment, useEffect, useState } from 'react'
-import { useDispatch, useSelector } from 'react-redux'
-import { RootStore } from 'store'
+import { useSelector } from 'react-redux'
+import { RootStore, useAppDispatch } from 'store'
 import { Post } from 'types/blog.type'
 
 const initialFormData: Post = {
@@ -19,21 +19,24 @@ export default function CreatePost() {
   useEffect(() => {
     setFormData(postEditing || initialFormData)
   }, [postEditing])
-  const dispatch = useDispatch()
+  const dispatch = useAppDispatch()
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault()
     if (postEditing) {
-      dispatch(finishEditingPost(formData))
-      dispatch(cancelEditingPost())
+      dispatch(
+        updatePost({
+          postId: postEditing.id,
+          body: formData
+        })
+      )
     } else {
-      const formDataWithId = { ...formData }
-      dispatch(addPost(formDataWithId))
+      dispatch(addPost(formData))
     }
 
     setFormData(initialFormData)
   }
   const handleReset = () => {
-    dispatch(cancelEditingPost())
+    // dispatch(cancelEditingPost())
   }
   return (
     <div>
