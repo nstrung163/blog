@@ -36,7 +36,7 @@ export const addPost = createAsyncThunk('blog/addPost', async (body: Omit<Post, 
     const response = await http.post<Post>('posts', body, { signal: thunkApi.signal })
     return response.data
   } catch (error: any) {
-    if (error.name === 'AxiosError' && error.response.state === 422) {
+    if (error.name === 'AxiosError' && error.response.status === 422) {
       return thunkApi.rejectWithValue(error.response.data)
     }
     throw error
@@ -46,8 +46,16 @@ export const addPost = createAsyncThunk('blog/addPost', async (body: Omit<Post, 
 export const updatePost = createAsyncThunk(
   'blog/updatePost',
   async ({ postId, body }: { postId: string; body: Post }, thunkApi) => {
-    const response = await http.put<Post>(`posts/${postId}`, body, { signal: thunkApi.signal })
-    return response.data
+    try {
+      const response = await http.put<Post>(`posts/${postId}`, body, { signal: thunkApi.signal })
+      return response.data
+    } catch (error: any) {
+      console.log('Error in blog slice', error)
+      if (error.name === 'AxiosError' && error.response.status === 422) {
+        return thunkApi.rejectWithValue(error.response.data)
+      }
+      throw error
+    }
   }
 )
 

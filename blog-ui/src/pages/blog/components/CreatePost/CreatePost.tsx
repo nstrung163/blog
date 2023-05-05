@@ -29,6 +29,13 @@ export default function CreatePost() {
           body: formData
         })
       )
+        .unwrap()
+        .then((response) => {
+          console.log(response)
+        })
+        .catch((error) => {
+          console.log('Error from create post', error)
+        })
     } else {
       dispatch(addPost(formData))
     }
