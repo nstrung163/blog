@@ -4,6 +4,10 @@ import { useSelector } from 'react-redux'
 import { RootStore, useAppDispatch } from 'store'
 import { Post } from 'types/blog.type'
 
+interface ErrorForm {
+  publishDate: string
+}
+
 const initialFormData: Post = {
   title: '',
   description: '',
@@ -15,12 +19,13 @@ const initialFormData: Post = {
 
 export default function CreatePost() {
   const [formData, setFormData] = useState<Post>(initialFormData)
+  const [errorForm, setErrorForm] = useState<null | ErrorForm>(null)
   const postEditing = useSelector((state: RootStore) => state.blog.postEditing || null)
   useEffect(() => {
     setFormData(postEditing || initialFormData)
   }, [postEditing])
   const dispatch = useAppDispatch()
-  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault()
     if (postEditing) {
       dispatch(
@@ -30,17 +35,26 @@ export default function CreatePost() {
         })
       )
         .unwrap()
-        .then((response) => {
-          console.log(response)
+        .then(() => {
+          setFormData(initialFormData)
+          if (errorForm) {
+            setErrorForm(null)
+          }
         })
         .catch((error) => {
-          console.log('Error from create post', error)
+          setErrorForm(error.error)
         })
     } else {
-      dispatch(addPost(formData))
+      try {
+        await dispatch(addPost(formData)).unwrap()
+        setFormData(initialFormData)
+        if (errorForm) {
+          setErrorForm(null)
+        }
+      } catch (error: any) {
+        setErrorForm(error.error)
+      }
     }
-
-    setFormData(initialFormData)
   }
   const handleReset = () => {
     // dispatch(cancelEditingPost())
@@ -98,12 +112,21 @@ export default function CreatePost() {
           <input
             type='datetime-local'
             id='publishDate'
-            className='block w-56 rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 focus:border-blue-500 focus:outline-none focus:ring-blue-500'
+            className={`block w-56 rounded-lg border  p-2.5 text-sm  focus:outline-none focus:ring-blue-500 ${
+              errorForm?.publishDate
+                ? 'border-red-300 bg-red-50  text-red-900 focus:border-red-500 focus:ring-red-500'
+                : 'border-gray-300 bg-gray-50 text-gray-900 focus:border-blue-500 focus:ring-blue-500'
+            }`}
             placeholder='Title'
             required
             value={formData.publishDate}
             onChange={(event) => setFormData((prev) => ({ ...prev, publishDate: event.target.value }))}
           />
+          {errorForm?.publishDate && (
+            <p className='mt-2 text-red-600'>
+              <span className='font-sm'>Error: {errorForm.publishDate}</span>
+            </p>
+          )}
         </div>
         <div className='mb-6 flex items-center'>
           <input
