@@ -1,5 +1,11 @@
+import Blog from "pages/blog"
+
 function App() {
-  return <div>Hello</div>
+  return (
+    <div>
+      <Blog />
+    </div>
+  )
 }
 
 export default App
