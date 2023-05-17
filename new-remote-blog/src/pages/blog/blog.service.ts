@@ -1,5 +1,6 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react"
 import { Post } from "types/blog.type"
+import { CustomError } from "utils/helpers"
 
 export const blogApi = createApi({
   reducerPath: "blogApi",
@@ -21,10 +22,18 @@ export const blogApi = createApi({
     }),
     addPosts: builder.mutation<Post, Omit<Post, "id">>({
       query(body) {
-        return {
-          url: "posts",
-          method: "POST",
-          body
+        try {
+          // throw Error("Add Post Failed!")
+          // let a: any = null
+          // a.b = 0
+          return {
+            url: "posts",
+            method: "POST",
+            body
+          }
+        } catch (error: any) {
+          console.log("Add post failed with custom", error)
+          throw new CustomError(error.message)
         }
       },
       invalidatesTags: (result, error, body) => (error ? [] : [{ type: "Posts", id: "LIST" }])

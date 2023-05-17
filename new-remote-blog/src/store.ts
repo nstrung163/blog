@@ -1,4 +1,5 @@
 import { configureStore } from "@reduxjs/toolkit"
+import { rtkQueryErrorLogger } from "middlewares"
 import { blogApi } from "pages/blog/blog.service"
 import blogReducer from "pages/blog/blog.slice"
 // ...
@@ -8,7 +9,7 @@ export const store = configureStore({
     blog: blogReducer,
     [blogApi.reducerPath]: blogApi.reducer
   },
-  middleware: (getDefaultMiddleware) => getDefaultMiddleware().concat(blogApi.middleware)
+  middleware: (getDefaultMiddleware) => getDefaultMiddleware().concat(blogApi.middleware, rtkQueryErrorLogger)
 })
 
 // Infer the `RootState` and `AppDispatch` types from the store itself
