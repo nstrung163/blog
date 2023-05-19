@@ -4,7 +4,13 @@ import { CustomError } from "utils/helpers"
 
 export const blogApi = createApi({
   reducerPath: "blogApi",
-  baseQuery: fetchBaseQuery({ baseUrl: "http://localhost:4000" }),
+  baseQuery: fetchBaseQuery({
+    baseUrl: "http://localhost:4000",
+    prepareHeaders(headers) {
+      headers.set("Authorization", "Bearer AVC")
+      return headers
+    }
+  }),
   tagTypes: ["Posts"],
   endpoints: (builder) => ({
     getPosts: builder.query<Post[], void>({
@@ -39,7 +45,13 @@ export const blogApi = createApi({
       invalidatesTags: (result, error, body) => (error ? [] : [{ type: "Posts", id: "LIST" }])
     }),
     getPost: builder.query<Post, string>({
-      query: (id) => `/posts/${id}`
+      query: (id) => ({
+        url: `/posts/${id}`,
+        params: {
+          name: "Trung",
+          age: 20
+        }
+      })
     }),
     updatePost: builder.mutation<Post, { id: string; body: Post }>({
       query: (data) => {
